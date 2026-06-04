@@ -1,0 +1,189 @@
+;;; package -- Summary:
+
+(require 'package)
+
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/")
+             t)
+
+(package-initialize)
+
+(setq-default truncate-lines t)
+(setq make-backup-files nil)
+(setq custom-file "~/.emacs.d/custom.el")
+(setq default-frame-alist '((font . "Iosevka-15")
+			    (width . 120)
+			    (height . 30)
+			    (top . 50)
+			    (left . 100)))
+
+(setq inhibit-startup-screen t)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(global-display-line-numbers-mode)
+(setq-default cursor-type 'bar)
+(load-file custom-file)
+
+(use-package ef-themes
+  :ensure t)
+(load-theme 'ef-elea-dark t)
+
+(setq ring-bell-function 'ignore)
+;; Built-in diagnostics UI
+(add-hook 'prog-mode-hook #'flymake-mode)
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c l") #'org-latex-preview))
+
+;;;; Org mode configuration
+;; Enable Org mode
+(require 'org)
+(setq org-src-fontify-natively t)
+(setq org-startup-with-inline-images t)
+(setq org-image-actual-width nil)
+(setq org-link-file-path-type 'relative)
+
+(use-package all-the-icons-dired
+     :ensure t)
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+
+(when (display-graphic-p)
+  (require 'all-the-icons))
+
+
+;; VHDL
+(setq vhdl-modify-date-on-saving nil)
+
+(setq vhdl-ext-feature-list
+      '(font-lock
+        xref
+        capf
+        hierarchy
+        eglot
+        flycheck
+        beautify
+        navigation
+        template
+        compilation
+        imenu
+        which-func
+        hideshow
+        ports))
+
+(require 'vhdl-ext)
+(vhdl-ext-mode-setup)
+(vhdl-ext-eglot-set-server 've-rust-hdl)
+
+;; CMake files
+(require 'cmake-mode)
+(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+
+;; Start Eglot automatically
+(add-hook 'java-mode-hook #'eglot-ensure)
+(add-hook 'c-mode-hook #'eglot-ensure)
+(add-hook 'c++-mode-hook #'eglot-ensure)
+(add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'cmake-mode-hook #'eglot-ensure)
+(add-hook 'vhdl-mode-hook #'eglot-ensure)
+(add-hook 'verilog-mode-hook #'eglot-ensure)
+
+(add-to-list 'auto-mode-alist '("\\.sv\\'" . verilog-mode))
+(add-to-list 'auto-mode-alist '("\\.svh\\'" . verilog-mode))
+(add-to-list 'auto-mode-alist '("\\.v\\'" . verilog-mode))
+(add-to-list 'auto-mode-alist '("\\.vh\\'" . verilog-mode))
+(add-to-list 'auto-mode-alist '("\\.vhd\\'" . vhdl-mode))
+(add-to-list 'auto-mode-alist '("\\.vhdl\\'" . vhdl-mode))
+
+(with-eval-after-load 'verilog-mode
+  (font-lock-add-keywords
+   'verilog-mode
+   '(("\\_<[A-Z][A-Z0-9_]*\\_>" . font-lock-constant-face))))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(java-mode . ("jdtls")))
+  (add-to-list 'eglot-server-programs
+               '((c-mode c++-mode cuda-mode) . ("clangd")))
+  (add-to-list 'eglot-server-programs
+               '(python-mode . ("basedpyright-langserver" "--stdio")))
+
+  (when (eq system-type 'windows-nt)
+  (add-to-list 'eglot-server-programs
+               '(cmake-mode . ("cmake-language-server.exe")))
+  (add-to-list 'eglot-server-programs
+               '(verilog-mode . ("verible-verilog-ls.exe"))))
+
+  (when (not(eq system-type 'windows-nt))
+  (add-to-list 'eglot-server-programs
+               '(cmake-mode . ("cmake-language-server")))
+  (add-to-list 'eglot-server-programs
+               '(verilog-mode . ("verible-verilog-ls")))))
+
+(setq eglot-send-changes-idle-time 0.2)
+
+(setq verilog-linter "verible-verilog-lint")
+(custom-set-faces
+ '(flymake-error ((t (:underline (:style wave :color "red")))))
+ '(flymake-warning ((t (:underline (:style wave :color "yellow")))))
+ '(flymake-note ((t (:underline (:style wave :color "forest green"))))))
+
+
+;;; function to create a new python project
+(defun my-find-python-command ()
+  (or (executable-find "py")
+      (executable-find "python3")
+      (error "Could not find python or python3 in PATH")))
+
+(defun my-python-project-init ()
+  "Initialize Python project and open venv shell in split window."
+  (interactive)
+  (let* ((project-dir (file-name-as-directory
+                       (read-directory-name "Project directory: ")))
+         (default-directory project-dir)
+         (python-cmd (my-find-python-command))
+         (venv-dir (expand-file-name ".venv" project-dir))
+         (venv-python
+          (expand-file-name
+           (if (eq system-type 'windows-nt)
+               "Scripts/python.exe"
+             "bin/python")
+           venv-dir))
+         (activate-script
+          (if (eq system-type 'windows-nt)
+              ".venv\\Scripts\\activate"
+            "source .venv/bin/activate"))
+         (config-file (expand-file-name "pyrightconfig.json" project-dir)))
+
+    ;; Create venv
+    (message "Creating virtual environment...")
+    (call-process python-cmd nil "*python-init*" t "-m" "venv" ".venv")
+
+    ;; Install basedpyright
+    (message "Installing basedpyright...")
+    (call-process venv-python nil "*python-init*" t
+                  "-m" "pip" "install" "-U" "pip" "basedpyright")
+
+    ;; Create config file
+    (unless (file-exists-p config-file)
+      (with-temp-file config-file
+        (insert
+         "{\n"
+         "  \"venvPath\": \".\",\n"
+         "  \"venv\": \".venv\",\n"
+         "  \"typeCheckingMode\": \"basic\"\n"
+         "}\n")))
+
+    ;; --- WINDOW SPLIT PART ---
+    (split-window-below)
+    (other-window 1)
+
+    ;; Open shell
+    (let ((default-directory project-dir))
+      (shell (generate-new-buffer-name "*venv-shell*"))
+
+      ;; Activate venv automatically
+      (comint-send-string (get-buffer-process (current-buffer))
+                          (concat activate-script "\n")))
+
+    (message "Python project ready!")))
