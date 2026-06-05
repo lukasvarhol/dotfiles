@@ -36,7 +36,7 @@ if (!(Test-Path "C:\verible")) {
     $extractedDir = Get-ChildItem -Path "$env:TEMP\verible_extract" | Select-Object -First 1
     Move-Item -Path $extractedDir.FullName -Destination "C:\verible"
     $oldPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-    [System.Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\verible\bin", 'Machine')
+    [System.Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\verible", 'Machine')
 }
 
 # Install VHDL_LS
