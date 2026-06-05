@@ -1,17 +1,41 @@
-# Cross-platform environment dotfiles
-I found it really frustrating having to manually sync up my Emacs config while wroking on multiple devices, so I finally decided to use chezmoi in order to have a persistent environment wherever I go.
+# Cross-platform dotfiles
 
-# Prerequisites
-- If Emacs had already been opened on a Windows machine, delete `...\AppData\Roaming\.emacs.d\` before running chezmoi.
+Managing an Emacs config across multiple devices was becoming a pain, so this repo uses [chezmoi](https://www.chezmoi.io/) to keep everything in sync across Windows, Linux, and macOS. Cloning on a new machine and running `chezmoi apply` handles package installation, fonts, LSP servers, and editor configuration automatically.
 
-# Setup
-On a new computer, make sure you have [chezmoi](https://www.chezmoi.io/install/) installed and on path.
-Then, simply run:
+## Setup
+
+Make sure [chezmoi](https://www.chezmoi.io/install/) is installed and on your PATH, then run:
+
 ```bash
+chezmoi init git@github.com:lukasvarhol/dotfiles.git
 chezmoi apply
 ```
 
-To pull the latest changes run:
+To pull and apply the latest changes:
+
 ```bash
 chezmoi update
 ```
+
+## Features
+
+**Emacs**
+- Language support via Eglot (LSP): Python, C/C++, CMake, Java, SystemVerilog, VHDL
+- clangd configured with automatic `compile_commands.json` via a global CMake toolchain file
+- Corfu inline completion
+- Flyspell spell checking (en\_GB) for `.org` and `.md` files
+- Theme: ef-elea-dark
+- Delete selection mode, truncated lines, no backup files
+
+**Environment**
+- Iosevka font installed automatically
+- LSP servers installed automatically: clangd, jdtls, verible, vhdl-ls, cmake-language-server, basedpyright
+
+## Platform Notes
+
+**Windows**
+- If Emacs has been opened on the machine before, delete `%APPDATA%\.emacs.d\` before running `chezmoi apply`. Emacs creates this directory on first launch, which prevents chezmoi from creating the required junction to `~\.emacs.d\`.
+- The install script requires an elevated PowerShell window — chezmoi will prompt for this automatically.
+
+**macOS**
+- Hunspell dictionaries must be placed in `/Library/Spelling/`. The install script handles this automatically.
