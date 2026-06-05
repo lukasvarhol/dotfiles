@@ -7,6 +7,11 @@ winget install --id=Microsoft.VisualStudio.2022.BuildTools -e;
 
 py -3.12 -m pip install --user cmake-language-server basedpyright
 
+# Create junction for Emacs config
+if (!(Test-Path "$env:APPDATA\.emacs.d")) {
+    cmd /c mklink /J "$env:APPDATA\.emacs.d" "$env:USERPROFILE\.emacs.d"
+}
+
 # Install vcpkg
 if (!(Test-Path "C:\vcpkg")) {
    git clone https://github.com/microsoft/vcpkg C:\vcpkg
