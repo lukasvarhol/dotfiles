@@ -56,14 +56,20 @@
 
 ;; Spell-checking
 (use-package flyspell
-  :ensure t
   :hook
   (org-mode . flyspell-mode)
   (markdown-mode . flyspell-mode))
-(setq ispell-program-name "hunspell")
-(setq ispell-dictionary "en_GB")
-(when (eq system-type 'windows-nt)
-  (setenv "DICPATH" "C:\\Hunspell"))
+
+(use-package ispell
+  :init
+  (when (eq system-type 'windows-nt)
+    (setenv "DICTIONARY" "en_GB")
+    (setenv "DICPATH" "C:\\Hunspell"))
+  :custom
+  (ispell-program-name (executable-find "hunspell"))
+  (ispell-local-dictionary "en_GB")
+  (ispell-local-dictionary-alist
+   '(("en_GB" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_GB") nil utf-8))))
 
 ;; Built-in diagnostics UI
 (add-hook 'prog-mode-hook #'flymake-mode)
