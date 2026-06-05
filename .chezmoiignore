@@ -1,0 +1,6 @@
+{{- if ne .chezmoi.os "windows" }}
+run_onchange_install-packages.ps1.tmpl
+{{- end }}
+{{- if eq .chezmoi.os "windows" }}
+run_onchange_install-packages.sh.tmpl
+{{- end }}
