@@ -1,6 +1,9 @@
 # Cross-platform environment dotfiles
 I found it really frustrating having to manually sync up my Emacs config while wroking on multiple devices, so I finally decided to use chezmoi in order to have a persistent environment wherever I go.
 
+# Prerequisites
+- If Emacs had already been opened on a Windows machine, delete `...\AppData\Roaming\.emacs.d\` before running chezmoi.
+
 # Setup
 On a new computer, make sure you have [chezmoi](https://www.chezmoi.io/install/) installed and on path.
 Then, simply run:
