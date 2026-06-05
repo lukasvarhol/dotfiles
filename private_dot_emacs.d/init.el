@@ -49,7 +49,6 @@
 ;; Enable auto completion, configure delay, trigger and quitting
 (setq corfu-auto t
       corfu-auto-delay 0.2
-      corfu-auto-trigger "." ;; Custom trigger characters
       corfu-quit-no-match 'separator) ;; or t
 
 (when (display-graphic-p)
@@ -70,39 +69,30 @@
 
 
 ;; VHDL
-(setq vhdl-modify-date-on-saving nil)
-
-(setq vhdl-ext-feature-list
-      '(font-lock
-        xref
-        capf
-        hierarchy
-        eglot
-        flycheck
-        beautify
-        navigation
-        template
-        compilation
-        imenu
-        which-func
-        hideshow
-        ports))
-
-(require 'vhdl-ext)
-(vhdl-ext-mode-setup)
-(vhdl-ext-eglot-set-server 've-rust-hdl)
+(use-package vhdl-ext
+  :ensure t
+  :custom
+  (vhdl-modify-date-on-saving nil)
+  (vhdl-ext-feature-list
+   '(font-lock xref capf hierarchy eglot flycheck beautify
+     navigation template compilation imenu which-func
+     hideshow ports))
+  :config
+  (vhdl-ext-mode-setup)
+  (vhdl-ext-eglot-set-server 've-rust-hdl))
 
 ;; CMake files
-(require 'cmake-mode)
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+(use-package cmake-mode
+  :ensure t
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+         ("\\.cmake\\'" . cmake-mode))
+  :hook (cmake-mode . eglot-ensure))
 
 ;; Start Eglot automatically
 (add-hook 'java-mode-hook #'eglot-ensure)
 (add-hook 'c-mode-hook #'eglot-ensure)
 (add-hook 'c++-mode-hook #'eglot-ensure)
 (add-hook 'python-mode-hook #'eglot-ensure)
-(add-hook 'cmake-mode-hook #'eglot-ensure)
 (add-hook 'vhdl-mode-hook #'eglot-ensure)
 (add-hook 'verilog-mode-hook #'eglot-ensure)
 
