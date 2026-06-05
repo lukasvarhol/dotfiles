@@ -60,6 +60,10 @@
   :hook
   (org-mode . flyspell-mode)
   (markdown-mode . flyspell-mode))
+(setq ispell-program-name "hunspell")
+(setq ispell-dictionary "en_GB")
+(when (eq system-type 'windows-nt)
+  (setenv "DICPATH" "C:\\Hunspell"))
 
 ;; Built-in diagnostics UI
 (add-hook 'prog-mode-hook #'flymake-mode)

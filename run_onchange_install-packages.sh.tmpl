@@ -1,6 +1,6 @@
 {{ if eq .chezmoi.os "linux" -}}
 #!/bin/sh
-sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell
+sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell hunspell-en-gb
 python3.12 -m pip install --user --break-system-packages cmake-language-server basedpyright
 
 # Install Verible Verilog Language Server
@@ -74,5 +74,11 @@ if [ ! -d "$HOME/Library/Fonts/Iosevka" ]; then
     mkdir -p ~/Library/Fonts/Iosevka/
     mv /tmp/iosevka_fonts/* ~/Library/Fonts/Iosevka/
     rm -rf /tmp/iosevka*
+fi
+
+# Install hunspell en_GB dictionary
+if [ ! -f "/Library/Spelling/en_GB.dic" ]; then
+    sudo curl -L "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_GB.dic" -o "/Library/Spelling/en_GB.dic"
+    sudo curl -L "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_GB.aff" -o "/Library/Spelling/en_GB.aff"
 fi
 {{ end -}}

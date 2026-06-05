@@ -72,4 +72,11 @@ if (!(Test-Path "C:\Windows\Fonts\Iosevka-Regular.ttf")) {
         New-ItemProperty -Name $Font.BaseName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -PropertyType string -Value $Font.name
     }
 }
+
+# Install hunspell en_GB dictionary
+if (!(Test-Path "C:\Hunspell\en_GB.dic")) {
+    New-Item -ItemType Directory -Force -Path "C:\Hunspell"
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_GB.dic" -UseBasicParsing -OutFile "C:\Hunspell\en_GB.dic"
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_GB.aff" -UseBasicParsing -OutFile "C:\Hunspell\en_GB.aff"
+}
 {{ end -}}
