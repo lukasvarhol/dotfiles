@@ -16,6 +16,7 @@
 (scroll-bar-mode -1)                                  ; hide scroll bar
 (setq-default cursor-type 'bar)                       ; set cursor as bar
 (global-display-line-numbers-mode)                    ; show global line numbers (not relative line)
+(delete-selection-mode 1)                             ; overwrite selected text
 (setq default-frame-alist '((font . "Iosevka-15")     ; set Iosevka font, size 15
 			    (width . 120)             ; set default window dimensions
 			    (height . 30)
@@ -55,24 +56,29 @@
   (require 'all-the-icons))
 
 ;; Spell-checking
-(use-package flyspell
-  :hook
-  (org-mode . flyspell-mode)
-  (markdown-mode . flyspell-mode))
-
-(use-package ispell
-  :init
+(with-eval-after-load 'ispell
+  (setenv "LANG" "en_GB.UTF-8")
   (when (eq system-type 'windows-nt)
     (setenv "DICTIONARY" "en_GB")
     (setenv "DICPATH" "C:\\Hunspell")
     (setq ispell-hunspell-dict-paths-alist
-        '(("en_GB" "C:/Hunspell/en_GB.aff"))))
-  
-  :custom
-  (ispell-program-name (executable-find "hunspell"))
-  (ispell-local-dictionary "en_GB")
-  (ispell-local-dictionary-alist
-   '(("en_GB" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_GB") nil utf-8))))
+          '(("en_GB" "C:/Hunspell/en_GB.aff"))))
+  (when (eq system-type 'gnu/linux)
+    (setq ispell-hunspell-dict-paths-alist
+          '(("en_GB" "/usr/share/hunspell/en_GB.aff"))))
+  (when (eq system-type 'darwin)
+    (setq ispell-hunspell-dict-paths-alist
+          '(("en_GB" "/Library/Spelling/en_GB.aff"))))
+  (setq ispell-program-name (executable-find "hunspell"))
+  (setq ispell-local-dictionary "en_GB")
+  (setq ispell-local-dictionary-alist
+        '(("en_GB" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_GB") nil utf-8)
+          ("british" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_GB") nil utf-8))))
+
+(use-package flyspell
+  :hook
+  (org-mode . flyspell-mode)
+  (markdown-mode . flyspell-mode))
 
 ;; Built-in diagnostics UI
 (add-hook 'prog-mode-hook #'flymake-mode)
