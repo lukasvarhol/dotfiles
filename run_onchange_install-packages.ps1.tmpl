@@ -75,7 +75,7 @@ if (!(Test-Path "C:\Windows\Fonts\Iosevka-Regular.ttf")) {
 
 # Ensure tool bin directories are on PATH
 $machinePath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-$pathsToAdd = @("C:\verible\bin", "C:\vhdl_ls\bin", "C:\jdtls\bin", "C:\Program Files\Emacs\emacs-30.1\bin")
+$pathsToAdd = @("C:\verible", "C:\vhdl_ls\bin", "C:\jdtls\bin", "C:\Program Files\Emacs\emacs-30.1\bin")
 foreach ($p in $pathsToAdd) {
     if ($machinePath -notlike "*$p*") {
         $machinePath = "$machinePath;$p"
