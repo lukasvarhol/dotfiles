@@ -124,3 +124,4 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PATH="$HOME/bin:$PATH"
 export CMAKE_TOOLCHAIN_FILE="$HOME/.cmake/toolchain.cmake"
 export PATH="$HOME/.local/bin:$PATH"
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
