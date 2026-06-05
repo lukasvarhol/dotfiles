@@ -1,6 +1,6 @@
 {{ if eq .chezmoi.os "linux" -}}
 #!/bin/sh
-sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd
+sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell
 python3.12 -m pip install --user --break-system-packages cmake-language-server basedpyright
 
 # Install Verible Verilog Language Server
@@ -44,7 +44,7 @@ if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
 fi
 {{ else if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
-brew install wget python@3.12 openjdk@21 cmake llvm jdtls cmake-language-server basedpyright
+brew install wget python@3.12 openjdk@21 cmake llvm jdtls cmake-language-server basedpyright hunspell
 
 # Install Verible Verilog Language Server
 if ! command -v verible-verilog-ls >/dev/null 2>&1; then

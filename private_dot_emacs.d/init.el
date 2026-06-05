@@ -54,6 +54,13 @@
 (when (display-graphic-p)
   (require 'all-the-icons))
 
+;; Spell-checking
+(use-package flyspell
+  :ensure t
+  :hook
+  (org-mode . flyspell-mode)
+  (markdown-mode . flyspell-mode))
+
 ;; Built-in diagnostics UI
 (add-hook 'prog-mode-hook #'flymake-mode)
 (with-eval-after-load 'org
@@ -66,7 +73,6 @@
 (setq org-startup-with-inline-images t)
 (setq org-image-actual-width nil)
 (setq org-link-file-path-type 'relative)
-
 
 ;; VHDL
 (use-package vhdl-ext
