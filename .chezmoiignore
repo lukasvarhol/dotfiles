@@ -1,9 +1,0 @@
-{{ if ne .chezmoi.os "linux" }}
-run_onchange_install-packages-ubuntu.sh
-{{ end }}
-{{ if ne .chezmoi.os "windows" }}
-run_onchange_install-packages-windows.ps1
-{{ end }}
-{{ if ne .chezmoi.os "darwin" }}
-run_onchange_install-packages-macos.sh
-{{ end }}
