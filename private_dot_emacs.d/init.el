@@ -64,7 +64,10 @@
   :init
   (when (eq system-type 'windows-nt)
     (setenv "DICTIONARY" "en_GB")
-    (setenv "DICPATH" "C:\\Hunspell"))
+    (setenv "DICPATH" "C:\\Hunspell")
+    (setq ispell-hunspell-dict-paths-alist
+        '(("en_GB" "C:/Hunspell/en_GB.aff"))))
+  
   :custom
   (ispell-program-name (executable-find "hunspell"))
   (ispell-local-dictionary "en_GB")
