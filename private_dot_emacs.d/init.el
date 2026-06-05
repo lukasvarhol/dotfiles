@@ -37,6 +37,19 @@
      :ensure t)
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
+(use-package corfu
+  :ensure t
+  :custom
+  (corfu-cycle t)
+  :init
+  (global-corfu-mode))
+
+;; Enable auto completion, configure delay, trigger and quitting
+(setq corfu-auto t
+      corfu-auto-delay 0.2
+      corfu-auto-trigger "." ;; Custom trigger characters
+      corfu-quit-no-match 'separator) ;; or t
+
 (when (display-graphic-p)
   (require 'all-the-icons))
 

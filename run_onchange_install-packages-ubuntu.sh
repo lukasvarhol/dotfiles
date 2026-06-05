@@ -1,0 +1,50 @@
+#!/bin/sh
+
+sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd
+
+python3.12 -m pip install --user --break-system-packages cmake-language-server basedpyright
+
+# Install Verible Verilog Language Server
+if ! command -v verible-verilog-ls >/dev/null 2>&1; then
+    VERIBLE_URL=$(curl -s https://api.github.com/repos/chipsalliance/verible/releases/latest | grep linux-static-x86 | grep browser_download_url | sed 's/.*"browser_download_url": //' | tr -d ' "')
+    wget $VERIBLE_URL -O /tmp/verible.tar.gz
+    tar -xvzf /tmp/verible.tar.gz -C /tmp/
+    sudo mv /tmp/verible-*/bin/* /usr/local/bin/
+    rm -rf /tmp/verible*
+fi
+
+# Install VHDL_LS 
+if ! command -v vhdl_ls >/dev/null 2>&1; then
+    VHDL_LS_URL=$(curl -s https://api.github.com/repos/VHDL-LS/rust_hdl/releases/latest | grep vhdl_ls | grep x86 | grep linux-gnu | grep browser_download_url | sed 's/.*"browser_download_url": //' | tr -d ' "')
+    wget $VHDL_LS_URL -O /tmp/vhdl_ls.zip
+    unzip -d /tmp/ /tmp/vhdl_ls.zip
+    sudo mkdir -p /usr/local/vhdl_ls/
+    sudo mv /tmp/vhdl_ls*/* /usr/local/vhdl_ls/
+    sudo ln -s /usr/local/vhdl_ls/bin/vhdl_ls /usr/local/bin/vhdl_ls
+    rm -rf /tmp/vhdl_ls*
+fi
+
+# Install jdtls (Java language server)
+if ! command -v jdtls >/dev/null 2>&1; then
+    wget -q https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz -O /tmp/jdtls.tar.gz
+    sudo mkdir -p /usr/local/jdtls/
+    sudo tar -xvzf /tmp/jdtls.tar.gz -C /usr/local/jdtls/
+    sudo ln -s /usr/local/jdtls/bin/jdtls /usr/local/bin/jdtls
+    rm -rf /tmp/jdtls*
+fi
+
+# Install Iosevka font
+if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
+    IOSEVKA_URL=$(curl -s https://api.github.com/repos/be5invis/Iosevka/releases/latest | grep browser_download_url | grep -i ttf | grep "PkgTTF-Iosevka-[0-9]" | sed 's/.*"browser_download_url": //' | tr -d ' "')
+    wget $IOSEVKA_URL -O /tmp/iosevka.zip
+    unzip /tmp/iosevka.zip -d /tmp/iosevka_fonts/
+    mkdir -p ~/.local/share/fonts/Iosevka/
+    mv /tmp/iosevka_fonts/* ~/.local/share/fonts/Iosevka/
+    fc-cache -fv
+    rm -rf /tmp/iosevka*
+fi
+
+	
+
+    
+
