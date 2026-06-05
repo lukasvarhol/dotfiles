@@ -73,6 +73,16 @@ if (!(Test-Path "C:\Windows\Fonts\Iosevka-Regular.ttf")) {
     }
 }
 
+# Ensure tool bin directories are on PATH
+$machinePath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
+$pathsToAdd = @("C:\verible\bin", "C:\vhdl_ls\bin", "C:\jdtls\bin")
+foreach ($p in $pathsToAdd) {
+    if ($machinePath -notlike "*$p*") {
+        $machinePath = "$machinePath;$p"
+    }
+}
+[System.Environment]::SetEnvironmentVariable('Path', $machinePath, 'Machine')
+
 # Install hunspell en_GB dictionary
 if (!(Test-Path "C:\Hunspell\en_GB.dic")) {
     New-Item -ItemType Directory -Force -Path "C:\Hunspell"
