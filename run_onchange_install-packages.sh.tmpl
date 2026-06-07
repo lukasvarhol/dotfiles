@@ -32,6 +32,19 @@ if ! command -v jdtls >/dev/null 2>&1; then
     rm -rf /tmp/jdtls*
 fi
 
+# Install Go
+if ! command -v go >/dev/null 2>&1; then
+    wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz -O /tmp/go.tar.gz
+    sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+    echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.bashrc
+    rm /tmp/go.tar.gz
+fi
+
+# Install gopls
+if ! command -v gopls >/dev/null 2>&1; then
+    /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
+fi
+
 # Install Iosevka font
 if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
     IOSEVKA_URL=$(curl -s https://api.github.com/repos/be5invis/Iosevka/releases/latest | grep browser_download_url | grep -i ttf | grep "PkgTTF-Iosevka-[0-9]" | sed 's/.*"browser_download_url": //' | tr -d ' "')
@@ -44,7 +57,9 @@ if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
 fi
 {{ else if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
-brew install wget python@3.12 openjdk@21 cmake llvm jdtls cmake-language-server basedpyright hunspell
+brew install wget python@3.12 openjdk@21 cmake llvm jdtls cmake-language-server basedpyright hunspell go
+
+go install golang.org/x/tools/gopls@latest
 
 # Install Verible Verilog Language Server
 if ! command -v verible-verilog-ls >/dev/null 2>&1; then

@@ -113,6 +113,10 @@
          ("\\.cmake\\'" . cmake-mode))
   :hook (cmake-mode . eglot-ensure))
 
+;; Go
+(use-package go-mode
+  :ensure t)
+
 ;; Start Eglot automatically
 (add-hook 'java-mode-hook #'eglot-ensure)
 (add-hook 'c-mode-hook #'eglot-ensure)
@@ -120,6 +124,7 @@
 (add-hook 'python-mode-hook #'eglot-ensure)
 (add-hook 'vhdl-mode-hook #'eglot-ensure)
 (add-hook 'verilog-mode-hook #'eglot-ensure)
+(add-hook 'go-mode-hook #'eglot-ensure)
 
 (add-to-list 'auto-mode-alist '("\\.sv\\'" . verilog-mode))
 (add-to-list 'auto-mode-alist '("\\.svh\\'" . verilog-mode))
@@ -140,6 +145,8 @@
                '((c-mode c++-mode cuda-mode) . ("clangd")))
   (add-to-list 'eglot-server-programs
                '(python-mode . ("basedpyright-langserver" "--stdio")))
+  (add-to-list 'eglot-server-programs
+	       '(go-mode . ("gopls")))
 
   (when (eq system-type 'windows-nt)
   (add-to-list 'eglot-server-programs
@@ -152,6 +159,7 @@
                '(cmake-mode . ("cmake-language-server")))
   (add-to-list 'eglot-server-programs
                '(verilog-mode . ("verible-verilog-ls")))))
+
 
 (setq eglot-send-changes-idle-time 0.2)
 

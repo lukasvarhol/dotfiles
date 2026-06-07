@@ -14,7 +14,9 @@ winget install --id=Kitware.CMake -e;
 winget install --id=LLVM.clangd -e;
 winget install --id=Microsoft.VisualStudio.2022.BuildTools -e;
 winget install --id=FSFhu.Hunspell -e;
+winget install --id=GoLang.Go -e;
 py -3.12 -m pip install --user cmake-language-server basedpyright
+go install golang.org/x/tools/gopls@latest
 
 # Create junction for Emacs config
 if (!(Test-Path "$env:APPDATA\.emacs.d")) {
