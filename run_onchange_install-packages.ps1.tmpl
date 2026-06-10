@@ -27,6 +27,9 @@ rustup component add rust-analyzer
 $raPath = rustup which rust-analyzer
 $cargoPath = "$env:USERPROFILE\.cargo\bin\rust-analyzer.exe"
 Copy-Item $raPath $cargoPath
+New-Item -ItemType Directory -Force -Path "C:\tools"
+Copy-Item "$env:USERPROFILE\.cargo\bin\rust-analyzer.exe" "C:\tools\rust-analyzer.exe"
+Copy-Item "$env:APPDATA\Python\Python312\Scripts\tclsp.exe" "C:\tools\tclsp.exe"
 
 npm install -g typescript-language-server typescript
 # Create junction for Emacs config
@@ -88,7 +91,7 @@ if (!(Test-Path "C:\Windows\Fonts\Iosevka-Regular.ttf")) {
 
 # Ensure tool bin directories are on PATH
 $machinePath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-$pathsToAdd = @("C:\verible", "C:\vhdl_ls\bin", "$env:USERPROFILE\.cargo\bin","C:\jdtls\bin", "C:\Program Files\Emacs\emacs-30.1\bin", "%APPDATA%\Python\Python312\Scripts", "%USERPROFILE%\go\bin")
+$pathsToAdd = @("C:\verible", "C:\vhdl_ls\bin", "C:\tools","C:\jdtls\bin", "C:\Program Files\Emacs\emacs-30.1\bin", "$env:USERPROFILE\go\bin")
 foreach ($p in $pathsToAdd) {
     if ($machinePath -notlike "*$p*") {
         $machinePath = "$machinePath;$p"

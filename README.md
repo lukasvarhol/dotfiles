@@ -20,16 +20,23 @@ chezmoi update
 ## Features
 
 **Emacs**
-- Language support via Eglot (LSP): Python, C/C++, CMake, Java, SystemVerilog, VHDL
+- Language support via Eglot (LSP) and associated language servers: 
+  - C/C++ 
+  - CMake
+  - Go
+  - Java
+  - JavaScript
+  - Powershell (no language server)
+  - Python 
+  - Rust
+  - SystemVerilog
+  - TCL
+  - VHDL
 - clangd configured with automatic `compile_commands.json` via a global CMake toolchain file
 - Corfu inline completion
 - Flyspell spell checking (en\_GB) for `.org` and `.md` files
 - Theme: ef-elea-dark
 - Delete selection mode, truncated lines, no backup files
-
-**Environment**
-- Iosevka font installed automatically
-- LSP servers installed automatically: clangd, jdtls, verible, vhdl-ls, cmake-language-server, basedpyright
 
 ## Platform Notes
 
