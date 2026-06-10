@@ -11,6 +11,8 @@ fi
 npm install -g typescript-language-server typescript
 
 rustup component add rust-analyzer
+echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.bashrc
+ln -sf "$(rustup which rust-analyzer)" ~/.cargo/bin/rust-analyzer
 
 # Install Verible Verilog Language Server
 if ! command -v verible-verilog-ls >/dev/null 2>&1; then
@@ -66,11 +68,15 @@ if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
 fi
 {{ else if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
-brew install wget python@3.12 openjdk@21 cmake llvm jdtls node cmake-language-server basedpyright hunspell go rustup
+brew install wget python@3.12 openjdk@21 cmake llvm jdtls node cmake-language-server basedpyright hunspell go rustup pipx
+pipx install tclint
 
 go install golang.org/x/tools/gopls@latest
 
 rustup component add rust-analyzer
+echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.bashrc
+echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.zshrc
+ln -sf "$(rustup which rust-analyzer)" ~/.cargo/bin/rust-analyzer
 
 npm install -g typescript-language-server typescript
 
