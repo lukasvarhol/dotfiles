@@ -1,7 +1,16 @@
 {{ if eq .chezmoi.os "linux" -}}
 #!/bin/sh
-sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell hunspell-en-gb
-python3.12 -m pip install --user --break-system-packages cmake-language-server basedpyright
+sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell hunspell-en-gb nodejs npm
+python3.12 -m pip install --user --break-system-packages cmake-language-server basedpyright tclint
+
+# Install Rust
+if ! command -v rustup >/dev/null 2>&1; then
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+fi
+
+npm install -g typescript-language-server typescript
+
+rustup component add rust-analyzer
 
 # Install Verible Verilog Language Server
 if ! command -v verible-verilog-ls >/dev/null 2>&1; then
@@ -57,9 +66,13 @@ if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
 fi
 {{ else if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
-brew install wget python@3.12 openjdk@21 cmake llvm jdtls cmake-language-server basedpyright hunspell go
+brew install wget python@3.12 openjdk@21 cmake llvm jdtls node cmake-language-server basedpyright hunspell go rustup
 
 go install golang.org/x/tools/gopls@latest
+
+rustup component add rust-analyzer
+
+npm install -g typescript-language-server typescript
 
 # Install Verible Verilog Language Server
 if ! command -v verible-verilog-ls >/dev/null 2>&1; then
