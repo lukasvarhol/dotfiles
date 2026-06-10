@@ -5,11 +5,13 @@ python3.12 -m pip install --user --break-system-packages cmake-language-server b
 
 # Install Rust
 if ! command -v rustup >/dev/null 2>&1; then
-   if ! command -v rustup >/dev/null 2>&1; then
-   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-   export PATH="$HOME/.cargo/bin:$PATH"
-   mkdir -p ~/.cargo/bin
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 fi
+. "$HOME/.cargo/env"
+mkdir -p ~/.cargo/bin
+rustup component add rust-analyzer
+ln -sf "$(rustup which rust-analyzer)" ~/.cargo/bin/rust-analyzer
+echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.bashrc
 
 npm install -g typescript-language-server typescript
 
@@ -70,6 +72,7 @@ if [ ! -d "$HOME/.local/share/fonts/Iosevka" ]; then
     fc-cache -fv
     rm -rf /tmp/iosevka*
 fi
+
 {{ else if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
 brew install wget python@3.12 openjdk@21 cmake llvm jdtls node cmake-language-server basedpyright hunspell go rustup pipx
