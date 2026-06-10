@@ -5,7 +5,10 @@ python3.12 -m pip install --user --break-system-packages cmake-language-server b
 
 # Install Rust
 if ! command -v rustup >/dev/null 2>&1; then
+   if ! command -v rustup >/dev/null 2>&1; then
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+   export PATH="$HOME/.cargo/bin:$PATH"
+   mkdir -p ~/.cargo/bin
 fi
 
 npm install -g typescript-language-server typescript
@@ -75,9 +78,9 @@ pipx install tclint
 go install golang.org/x/tools/gopls@latest
 
 rustup component add rust-analyzer
+mkdir -p ~/.cargo/bin
 echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.bashrc
 echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.zshrc
-mkdir -p ~/.cargo/bin
 ln -sf "$(rustup which rust-analyzer)" ~/.cargo/bin/rust-analyzer
 
 npm install -g typescript-language-server typescript

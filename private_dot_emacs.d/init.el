@@ -7,6 +7,12 @@
 
 (package-initialize)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 ;;; Configure basic display and interaction settings
 (setq ring-bell-function 'ignore)                     ; turn off sounds
 (setq-default truncate-lines t)                       ; don't wrap lines
