@@ -175,7 +175,8 @@
   (add-to-list 'eglot-server-programs
               '(go-mode . ("gopls")))
   (add-to-list 'eglot-server-programs
-               '(rust-mode . ("rust-analyzer")))
+               '((rust-ts-mode rust-mode) .
+		 ("rust-analyzer" :initializationOptions (:check (:command "clippy")))))
   (add-to-list 'eglot-server-programs
 	       '(tcl-mode . ("tclsp")))
   (add-to-list 'eglot-server-programs
