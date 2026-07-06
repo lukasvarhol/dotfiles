@@ -15,7 +15,8 @@
 
 ;;; Configure basic display and interaction settings
 (setq ring-bell-function 'ignore)                     ; turn off sounds
-(setq-default truncate-lines t)                       ; don't wrap lines
+(add-hook 'text-mode-hook #'word-wrap-whitespace-mode); wrap words
+(add-hook 'prog-mode-hook #'word-wrap-whitespace-mode)
 (setq inhibit-startup-screen t)                       ; disable splash screen
 (menu-bar-mode -1)                                    ; turn off menu bar
 (tool-bar-mode -1)                                    ; turn off tool bar
@@ -39,7 +40,7 @@
 ;;; Appearance
 (use-package ef-themes                                 ; install theme package
   :ensure t)
-(load-theme 'ef-elea-dark t)                           ; use theme
+(load-theme 'ef-spring t)                           ; use theme
  
 (use-package all-the-icons-dired                       ; install dired irons package
      :ensure t)
