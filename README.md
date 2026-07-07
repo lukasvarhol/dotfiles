@@ -22,10 +22,12 @@ chezmoi update
 **Emacs**
 - Language support via Eglot (LSP) and associated language servers: 
   - C/C++ 
+  - CUDA
   - CMake
   - Go
   - Java
   - JavaScript
+  - Nix
   - Powershell (no language server)
   - Python 
   - Rust
@@ -35,8 +37,8 @@ chezmoi update
 - clangd configured with automatic `compile_commands.json` via a global CMake toolchain file
 - Corfu inline completion
 - Flyspell spell checking (en\_GB) for `.org` and `.md` files
-- Theme: ef-elea-dark
-- Delete selection mode, truncated lines, no backup files
+- Theme: ef-spring
+- Delete selection mode, global word-wrap, no backup files
 
 ## Platform Notes
 

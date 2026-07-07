@@ -142,6 +142,10 @@
 (use-package cuda-mode
   :ensure t)
 
+;; Nix
+(use-package nix-mode
+  :ensure t)
+
 ;; Start Eglot automatically
 (add-hook 'java-mode-hook #'eglot-ensure)
 (add-hook 'c-mode-hook #'eglot-ensure)
