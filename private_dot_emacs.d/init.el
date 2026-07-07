@@ -15,8 +15,7 @@
 
 ;;; Configure basic display and interaction settings
 (setq ring-bell-function 'ignore)                     ; turn off sounds
-(add-hook 'text-mode-hook #'word-wrap-whitespace-mode); wrap words
-(add-hook 'prog-mode-hook #'word-wrap-whitespace-mode)
+(global-word-wrap-whitespace-mode 1)                  ; wrap words
 (setq inhibit-startup-screen t)                       ; disable splash screen
 (menu-bar-mode -1)                                    ; turn off menu bar
 (tool-bar-mode -1)                                    ; turn off tool bar
@@ -40,7 +39,7 @@
 ;;; Appearance
 (use-package ef-themes                                 ; install theme package
   :ensure t)
-(load-theme 'ef-spring t)                           ; use theme
+(load-theme 'ef-spring t)                              ; use theme
  
 (use-package all-the-icons-dired                       ; install dired irons package
      :ensure t)
@@ -105,6 +104,7 @@
 (setq org-startup-with-inline-images t)
 (setq org-image-actual-width nil)
 (setq org-link-file-path-type 'relative)
+(setq org-startup-truncated nil)
 
 ;; VHDL
 (use-package vhdl-ext
@@ -138,6 +138,10 @@
 (use-package powershell
   :ensure t)
 
+;; CUDA
+(use-package cuda-mode
+  :ensure t)
+
 ;; Start Eglot automatically
 (add-hook 'java-mode-hook #'eglot-ensure)
 (add-hook 'c-mode-hook #'eglot-ensure)
@@ -149,6 +153,7 @@
 (add-hook 'rust-mode-hook #'eglot-ensure)
 (add-hook 'js-mode-hook #'eglot-ensure)
 (add-hook 'tcl-mode-hook #'eglot-ensure)
+(add-hook 'cuda-mode #'eglot-ensure)
 
 (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
 (add-to-list 'auto-mode-alist '("\\.xdc\\'" . tcl-mode))
