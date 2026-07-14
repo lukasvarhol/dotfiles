@@ -23,7 +23,7 @@
 (setq-default cursor-type 'bar)                       ; set cursor as bar
 (global-display-line-numbers-mode)                    ; show global line numbers (not relative line)
 (delete-selection-mode 1)                             ; overwrite selected text
-(setq default-frame-alist '((font . "Iosevka-15")     ; set Iosevka font, size 15
+(setq default-frame-alist '((font . "Iosevka Nerd Font Mono-15")     ; set Iosevka font, size 15
 			    (width . 120)             ; set default window dimensions
 			    (height . 30)
 			    (top . 50)
@@ -140,10 +140,6 @@
 
 ;; CUDA
 (use-package cuda-mode
-  :ensure t)
-
-;; Nix
-(use-package nix-mode
   :ensure t)
 
 ;; Start Eglot automatically

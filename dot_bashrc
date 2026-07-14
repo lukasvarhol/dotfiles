@@ -126,3 +126,4 @@ export CMAKE_TOOLCHAIN_FILE="$HOME/.cmake/toolchain.cmake"
 export PATH="$HOME/.local/bin:$PATH"
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+export STARSHIP_CONFIG=~/example/non/default/path/starship.toml
