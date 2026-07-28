@@ -75,17 +75,30 @@ if (!(Test-Path "C:\jdtls")) {
     [System.Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\jdtls\bin", 'Machine')
 }
 
-# Install Iosevka font
-if (!(Test-Path "C:\Windows\Fonts\Iosevka-Regular.ttf")) {
-    $url = (Invoke-WebRequest -Uri "https://api.github.com/repos/be5invis/Iosevka/releases/latest" -UseBasicParsing | ConvertFrom-Json).assets | Where-Object { $_.name -match "^PkgTTF-Iosevka-\d" } | Select-Object -ExpandProperty browser_download_url
+# Install Iosevka Nerd Font
+if (!(Test-Path "C:\Windows\Fonts\IosevkaNerdFontMono-Regular.ttf")) {
+    $url = (Invoke-WebRequest -Uri "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" -UseBasicParsing | ConvertFrom-Json).assets | Where-Object { $_.name -eq "Iosevka.zip" } | Select-Object -ExpandProperty browser_download_url
     Invoke-WebRequest -Uri $url -UseBasicParsing -OutFile "$env:TEMP\iosevka.zip"
-    Expand-Archive -Path "$env:TEMP\iosevka.zip" -DestinationPath "$env:TEMP\iosevka"
-    $FontItem = Get-Item -Path "$env:TEMP\iosevka"
-    $FontList = Get-ChildItem -Path "$FontItem\*" -Include ('*.fon','*.otf','*.ttc','*.ttf')
+    Remove-Item -Recurse -Force "$env:TEMP\iosevka" -ErrorAction SilentlyContinue
+    Expand-Archive -Path "$env:TEMP\iosevka.zip" -DestinationPath "$env:TEMP\iosevka" -Force
+
+    Add-Type -AssemblyName System.Drawing
+    $FontList = Get-ChildItem -Path "$env:TEMP\iosevka\*" -Include ('*.fon','*.otf','*.ttc','*.ttf')
     foreach ($Font in $FontList) {
-        Write-Host 'Installing font -' $Font.BaseName
-        Copy-Item $Font "C:\Windows\Fonts"
-        New-ItemProperty -Name $Font.BaseName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -PropertyType string -Value $Font.name
+        $collection = New-Object System.Drawing.Text.PrivateFontCollection
+        $collection.AddFontFile($Font.FullName)
+        $familyName = $collection.Families[0].Name
+
+        # crude style detection from filename, good enough for registry naming
+        $style = ""
+        if ($Font.BaseName -match "Bold" -and $Font.BaseName -match "Italic|Oblique") { $style = " Bold Italic" }
+        elseif ($Font.BaseName -match "Bold") { $style = " Bold" }
+        elseif ($Font.BaseName -match "Italic|Oblique") { $style = " Italic" }
+
+        $regName = "$familyName$style (TrueType)"
+        Write-Host "Installing font -" $regName
+        Copy-Item $Font.FullName "C:\Windows\Fonts" -Force
+        New-ItemProperty -Name $regName -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Fonts" -PropertyType string -Value $Font.name -Force | Out-Null
     }
 }
 
