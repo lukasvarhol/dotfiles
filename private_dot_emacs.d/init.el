@@ -112,6 +112,11 @@
 
 (defconst my/windows-p (eq system-type 'windows-nt))
 
+(dolist (pkg '((auctex . "tex") (pdf-tools . "pdf-tools")))
+  (unless (locate-library (cdr pkg))
+    (unless package-archive-contents (package-refresh-contents))
+    (package-install (car pkg))))
+
 (use-package pdf-tools
   :ensure nil   ; Nix on Linux, package.el on Windows
   :magic ("%PDF" . pdf-view-mode)

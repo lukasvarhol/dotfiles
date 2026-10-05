@@ -1,6 +1,15 @@
-{{ if eq .chezmoi.os "linux" -}}
+{{ if and (eq .chezmoi.os "linux") (ne .chezmoi.osRelease.id "nixos") -}}
 #!/bin/sh
-sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell hunspell-en-gb nodejs npm
+# Non-NixOS Linux (e.g. Ubuntu under WSL). On NixOS, packages come from the Nix config.
+
+# Append a line to ~/.bashrc only if it isn't already there
+add_to_bashrc() {
+    grep -qxF "$1" "$HOME/.bashrc" 2>/dev/null || echo "$1" >> "$HOME/.bashrc"
+}
+
+sudo apt install -y gcc build-essential g++-14 python3.12 python3-pip openjdk-21-jdk cmake clangd hunspell hunspell-en-gb nodejs npm \
+    texlive-latex-extra latexmk \
+    libpoppler-glib-dev libpng-dev zlib1g-dev autoconf automake pkg-config
 python3.12 -m pip install --user --break-system-packages cmake-language-server basedpyright tclint
 
 # Install Rust
@@ -11,14 +20,9 @@ fi
 mkdir -p ~/.cargo/bin
 rustup component add rust-analyzer
 ln -sf "$(rustup which rust-analyzer)" ~/.cargo/bin/rust-analyzer
-echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.bashrc
+add_to_bashrc 'export PATH=$HOME/.cargo/bin:$PATH'
 
 npm install -g typescript-language-server typescript
-
-rustup component add rust-analyzer
-echo 'export PATH=$HOME/.cargo/bin:$PATH' >> ~/.bashrc
-mkdir -p ~/.cargo/bin
-ln -sf "$(rustup which rust-analyzer)" ~/.cargo/bin/rust-analyzer
 
 # Install Verible Verilog Language Server
 if ! command -v verible-verilog-ls >/dev/null 2>&1; then
@@ -49,13 +53,20 @@ if ! command -v jdtls >/dev/null 2>&1; then
     rm -rf /tmp/jdtls*
 fi
 
+# Install texlab (LaTeX language server)
+if ! command -v texlab >/dev/null 2>&1; then
+    wget https://github.com/latex-lsp/texlab/releases/latest/download/texlab-x86_64-linux.tar.gz -O /tmp/texlab.tar.gz
+    sudo tar -xzf /tmp/texlab.tar.gz -C /usr/local/bin/
+    rm -f /tmp/texlab.tar.gz
+fi
+
 # Install Go
 if ! command -v go >/dev/null 2>&1; then
     wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz -O /tmp/go.tar.gz
     sudo tar -C /usr/local -xzf /tmp/go.tar.gz
-    echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.bashrc
     rm /tmp/go.tar.gz
 fi
+add_to_bashrc 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin'
 
 # Install gopls
 if ! command -v gopls >/dev/null 2>&1; then

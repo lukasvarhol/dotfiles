@@ -17,6 +17,7 @@ winget install --id=FSFhu.Hunspell -e;
 winget install --id=GoLang.Go -e;
 winget install --id=Rustlang.Rustup -e;
 winget install --id=OpenJS.NodeJS -e;
+winget install --id=MSYS2.MSYS2 -e;
 
 py -3.12 -m pip install --user cmake-language-server basedpyright tclint
 
@@ -32,9 +33,11 @@ Copy-Item "$env:USERPROFILE\.cargo\bin\rust-analyzer.exe" "C:\tools\rust-analyze
 Copy-Item "$env:APPDATA\Python\Python312\Scripts\tclsp.exe" "C:\tools\tclsp.exe"
 
 npm install -g typescript-language-server typescript
-# Create junction for Emacs config
-if (!(Test-Path "$env:APPDATA\.emacs.d")) {
-    cmd /c mklink /J "$env:APPDATA\.emacs.d" "$env:USERPROFILE\.emacs.d"
+
+# Point HOME at the user profile so Emacs reads ~/.emacs.d (where chezmoi puts it)
+# instead of falling back to %APPDATA%\.emacs.d
+if ([System.Environment]::GetEnvironmentVariable('HOME', 'User') -ne $env:USERPROFILE) {
+    [System.Environment]::SetEnvironmentVariable('HOME', $env:USERPROFILE, 'User')
 }
 
 # Install vcpkg
@@ -51,8 +54,6 @@ if (!(Test-Path "C:\verible")) {
     Expand-Archive -Path "$env:TEMP\verible.zip" -DestinationPath "$env:TEMP\verible_extract\"
     $extractedDir = Get-ChildItem -Path "$env:TEMP\verible_extract" | Select-Object -First 1
     Move-Item -Path $extractedDir.FullName -Destination "C:\verible"
-    $oldPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-    [System.Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\verible", 'Machine')
 }
 
 # Install VHDL_LS
@@ -62,8 +63,6 @@ if (!(Test-Path "C:\vhdl_ls")) {
     Expand-Archive -Path "$env:TEMP\vhdl_ls.zip" -DestinationPath "$env:TEMP\vhdl_ls_extract\"
     $extractedDir = Get-ChildItem -Path "$env:TEMP\vhdl_ls_extract" | Select-Object -First 1
     Move-Item -Path $extractedDir.FullName -Destination "C:\vhdl_ls"
-    $oldPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-    [System.Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\vhdl_ls\bin", 'Machine')
 }
 
 # Install jdtls (Java Language Server)
@@ -71,8 +70,29 @@ if (!(Test-Path "C:\jdtls")) {
     Invoke-WebRequest -Uri "https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz" -UseBasicParsing -OutFile "$env:TEMP\jdtls.tar.gz"
     New-Item -ItemType Directory -Force -Path "C:\jdtls"
     tar -xzf "$env:TEMP\jdtls.tar.gz" -C "C:\jdtls"
-    $oldPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-    [System.Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\jdtls\bin", 'Machine')
+}
+
+# Install texlab (LaTeX language server) into C:\tools
+if (!(Test-Path "C:\tools\texlab.exe")) {
+    $url = (Invoke-WebRequest -Uri "https://api.github.com/repos/latex-lsp/texlab/releases/latest" -UseBasicParsing | ConvertFrom-Json).assets | Where-Object { $_.name -eq "texlab-x86_64-windows.zip" } | Select-Object -ExpandProperty browser_download_url
+    Invoke-WebRequest -Uri $url -UseBasicParsing -OutFile "$env:TEMP\texlab.zip"
+    Expand-Archive -Path "$env:TEMP\texlab.zip" -DestinationPath "C:\tools" -Force
+}
+
+# Install TeX Live (scheme-medium, no docs/sources). The installer adds its own
+# year-specific bin directory to PATH, so nothing is hardcoded here.
+if (!(Test-Path "C:\texlive")) {
+    Invoke-WebRequest -Uri "https://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip" -UseBasicParsing -OutFile "$env:TEMP\install-tl.zip"
+    Remove-Item -Recurse -Force "$env:TEMP\install-tl" -ErrorAction SilentlyContinue
+    Expand-Archive -Path "$env:TEMP\install-tl.zip" -DestinationPath "$env:TEMP\install-tl" -Force
+    $installer = Get-ChildItem -Path "$env:TEMP\install-tl" -Directory | Select-Object -First 1
+    & "$($installer.FullName)\install-tl-windows.bat" -no-gui -no-interaction -scheme scheme-medium -no-doc-install -no-src-install
+}
+
+# Install the pdf-tools server (epdfinfo) via MSYS2
+if (!(Test-Path "C:\msys64\ucrt64\bin\epdfinfo.exe")) {
+    & "C:\msys64\usr\bin\bash.exe" -lc "pacman -Syu --noconfirm"
+    & "C:\msys64\usr\bin\bash.exe" -lc "pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-emacs-pdf-tools-server"
 }
 
 # Install Iosevka Nerd Font
@@ -104,7 +124,14 @@ if (!(Test-Path "C:\Windows\Fonts\IosevkaNerdFontMono-Regular.ttf")) {
 
 # Ensure tool bin directories are on PATH
 $machinePath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-$pathsToAdd = @("C:\verible", "C:\vhdl_ls\bin", "C:\tools","C:\jdtls\bin", "C:\Program Files\Emacs\emacs-30.1\bin", "$env:USERPROFILE\go\bin")
+$pathsToAdd = @("C:\verible", "C:\vhdl_ls\bin", "C:\tools", "C:\jdtls\bin", "C:\msys64\ucrt64\bin", "$env:USERPROFILE\go\bin")
+
+# Find the newest installed Emacs instead of hardcoding its version
+$emacsDir = Get-ChildItem "C:\Program Files\Emacs" -Directory -Filter "emacs-*" -ErrorAction SilentlyContinue |
+    Sort-Object { [version]($_.Name -replace '^emacs-', '') } -Descending |
+    Select-Object -First 1
+if ($emacsDir) { $pathsToAdd += "$($emacsDir.FullName)\bin" }
+
 foreach ($p in $pathsToAdd) {
     if ($machinePath -notlike "*$p*") {
         $machinePath = "$machinePath;$p"
