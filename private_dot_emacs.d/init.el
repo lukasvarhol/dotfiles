@@ -21,9 +21,10 @@
 (tool-bar-mode -1)                                    ; turn off tool bar
 (scroll-bar-mode -1)                                  ; hide scroll bar
 (setq-default cursor-type 'bar)                       ; set cursor as bar
-(global-display-line-numbers-mode)                    ; show global line numbers (not relative line)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
 (delete-selection-mode 1)                             ; overwrite selected text
-(setq default-frame-alist '((font . "Iosevka Nerd Font Mono-15")     ; set Iosevka font, size 15
+(setq default-frame-alist '((font . "Iosevka NFM-15")     ; set Iosevka font, size 15
 			    (width . 120)             ; set default window dimensions
 			    (height . 30)
 			    (top . 50)
@@ -90,7 +91,8 @@
 (use-package flyspell
   :hook
   (org-mode . flyspell-mode)
-  (markdown-mode . flyspell-mode))
+  (markdown-mode . flyspell-mode)
+  (LaTeX-mode . flyspell-mode))
 
 ;; Built-in diagnostics UI
 (add-hook 'prog-mode-hook #'flymake-mode)
@@ -105,6 +107,56 @@
 (setq org-image-actual-width nil)
 (setq org-link-file-path-type 'relative)
 (setq org-startup-truncated nil)
+
+;;; LaTeX: AUCTeX + pdf-tools + latexmk + texlab
+
+(defconst my/windows-p (eq system-type 'windows-nt))
+
+(use-package pdf-tools
+  :ensure nil   ; Nix on Linux, package.el on Windows
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (when my/windows-p
+    (setq pdf-info-epdfinfo-program "C:/msys64/ucrt64/bin/epdfinfo.exe"))
+  (pdf-tools-install :no-query)
+  (setq-default pdf-view-display-size 'fit-width)
+  (setq pdf-view-use-scaling t))
+
+(use-package tex
+  :ensure nil                          ; AUCTeX, installed via Nix
+  :hook ((LaTeX-mode . TeX-source-correlate-mode)   ; SyncTeX
+         (LaTeX-mode . turn-on-reftex)
+         (LaTeX-mode . eglot-ensure)
+         (LaTeX-mode . my/latex-compile-on-save))
+    :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (TeX-PDF-mode t)
+  (TeX-source-correlate-start-server nil)
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (reftex-plug-into-AUCTeX t)
+  :config
+  (add-to-list 'TeX-command-list
+               '("LatexMk"
+                 "latexmk -pdf -synctex=1 -interaction=nonstopmode -file-line-error %t"
+                 TeX-run-TeX nil t :help "Run latexmk"))
+  ;; Refresh the PDF buffer after every build
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer)
+  (defun my/latex-compile-on-save ()
+    (add-hook 'after-save-hook
+              (lambda () (TeX-command "LatexMk" #'TeX-master-file))
+              nil t)))
+
+(add-to-list 'display-buffer-alist
+             '("\\.pdf\\'"
+               (display-buffer-reuse-window display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.5)))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '((LaTeX-mode latex-mode) . ("texlab"))))
 
 ;; VHDL
 (use-package vhdl-ext
@@ -153,7 +205,7 @@
 (add-hook 'rust-mode-hook #'eglot-ensure)
 (add-hook 'js-mode-hook #'eglot-ensure)
 (add-hook 'tcl-mode-hook #'eglot-ensure)
-(add-hook 'cuda-mode #'eglot-ensure)
+(add-hook 'cuda-mode-hook #'eglot-ensure)
 
 (add-to-list 'auto-mode-alist '("\\.sdc\\'" . tcl-mode))
 (add-to-list 'auto-mode-alist '("\\.xdc\\'" . tcl-mode))
@@ -170,6 +222,9 @@
   (font-lock-add-keywords
    'verilog-mode
    '(("\\_<[A-Z][A-Z0-9_]*\\_>" . font-lock-constant-face))))
+
+(with-eval-after-load 'vhdl-mode
+  (define-key vhdl-mode-map (kbd "RET") #'reindent-then-newline-and-indent))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
