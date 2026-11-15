@@ -1,53 +1,53 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[┌](fg:#b4c4c0) $directory$git_branch$git_status$nix_shell$python$rust$golang$java$nodejs
-[└](fg:#b4c4c0) $character"""
+[┌](fg:bright-black) $directory$git_branch$git_status$nix_shell$python$rust$golang$java$nodejs
+[└](fg:bright-black) $character"""
 
 [character]
-success_symbol = "[❯](fg:#007f68)"
-error_symbol = "[❯](fg:#c42d2f)"
+success_symbol = "[❯](fg:green)"
+error_symbol = "[❯](fg:red)"
 
 [directory]
-style = "fg:#375cc6 bold"
+style = "fg:blue bold"
 truncation_length = 4
 truncate_to_repo = true
 
 [git_branch]
 symbol = " "
-style = "fg:#1a870f bold"
+style = "fg:green bold"
 format = "[$symbol$branch]($style) "
 
 [git_status]
-style = "fg:#d5206f"
+style = "fg:purple"
 format = '([$all_status$ahead_behind]($style) )'
 
 [nix_shell]
 symbol = " "
-style = "fg:#265fbf"
+style = "fg:blue"
 format = "[$symbol$state]($style) "
 
 [python]
 symbol = " "
-style = "fg:#a45f22"
+style = "fg:yellow"
 format = "[$symbol$version]($style) "
 
 [rust]
 symbol = " "
-style = "fg:#d03003"
+style = "fg:red"
 format = "[$symbol$version]($style) "
 
 [golang]
 symbol = " "
-style = "fg:#1f6fbf"
+style = "fg:cyan"
 format = "[$symbol$version]($style) "
 
 [java]
 symbol = " "
-style = "fg:#d5206f"
+style = "fg:red"
 format = "[$symbol$version]($style) "
 
 [nodejs]
 symbol = " "
-style = "fg:#4a7d00"
+style = "fg:green"
 format = "[$symbol$version]($style) "

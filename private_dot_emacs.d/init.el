@@ -40,7 +40,7 @@
 ;;; Appearance
 (use-package ef-themes                                 ; install theme package
   :ensure t)
-(load-theme 'ef-spring t)                              ; use theme
+(load-theme 'base16-black-metal t)                              ; use theme
  
 (use-package all-the-icons-dired                       ; install dired irons package
      :ensure t)
